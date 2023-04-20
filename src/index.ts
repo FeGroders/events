@@ -3,7 +3,7 @@ import express from "express";
 import serverless from "serverless-http";
 import eventsRouter from "./routers/events-router";
 import registrationsRouter from "./routers/registrations-router";
-// import usersRouter from "./routers/users-router";
+import usersRouter from "./routers/users-router";
 
 // Porta do servidor
 const PORT = process.env.PORT || 4000;
@@ -34,7 +34,7 @@ app.use(
 const routerPrefix = "/api";
 app.use(routerPrefix, eventsRouter);
 app.use(routerPrefix, registrationsRouter);
-// app.use(routerPrefix, usersRouter);
+app.use(routerPrefix, usersRouter);
 
 // Resposta padrão para quaisquer outras requisições:
 app.use((req, res) => {

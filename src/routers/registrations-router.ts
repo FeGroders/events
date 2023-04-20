@@ -1,10 +1,11 @@
 import express from "express";
 import Registration from "../models/registration";
 import registrationsRepository from "../repositories/registrations-repository";
+import auth from "../middlewares/auth";
 
 const registrationsRouter = express.Router();
 
-registrationsRouter.post("/registrations", (req, res) => {
+registrationsRouter.post("/registrations", auth, (req, res) => {
   const registration: Registration = req.body;
   registrationsRepository.create(registration, (id) => {
     if (id) {
@@ -15,7 +16,7 @@ registrationsRouter.post("/registrations", (req, res) => {
   });
 });
 
-registrationsRouter.get("/registrations", (req, res) => {
+registrationsRouter.get("/registrations", auth, (req, res) => {
   registrationsRepository.readAll((registrations) => res.json(registrations));
 });
 
@@ -30,7 +31,7 @@ registrationsRouter.get("/registrations/:id", (req, res) => {
   });
 });
 
-registrationsRouter.get("/registrations/user/:userID", (req, res) => {
+registrationsRouter.get("/registrations/user/:userID", auth, (req, res) => {
   const userID: string = req.params.userID;
   registrationsRepository.readUserRegistrations(userID, (registrations) => {
     if (registrations) {
@@ -41,7 +42,7 @@ registrationsRouter.get("/registrations/user/:userID", (req, res) => {
   });
 });
 
-registrationsRouter.put("/registrations/:id", (req, res) => {
+registrationsRouter.put("/registrations/:id", auth, (req, res) => {
   const id: number = +req.params.id;
   registrationsRepository.update(id, req.body, (notFound) => {
     if (notFound) {
@@ -52,7 +53,7 @@ registrationsRouter.put("/registrations/:id", (req, res) => {
   });
 });
 
-registrationsRouter.delete("/registrations/:id", (req, res) => {
+registrationsRouter.delete("/registrations/:id", auth, (req, res) => {
   const id: number = +req.params.id;
   registrationsRepository.delete(id, (notFound) => {
     if (notFound) {
@@ -63,7 +64,7 @@ registrationsRouter.delete("/registrations/:id", (req, res) => {
   });
 });
 
-registrationsRouter.post("/checkIn/:id", (req, res) => {
+registrationsRouter.post("/checkIn/:id", auth, (req, res) => {
   const id: number = +req.params.id;
   registrationsRepository.checkIn(id, (notFound) => {
     if (notFound) {

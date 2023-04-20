@@ -1,14 +1,22 @@
 import sqlite3 from "sqlite3";
+import bcrypt from "bcrypt";
 
 const DBSOURCE = "db.sqlite";
 
 const SQL_USERS_CREATE = `
-  CREATE TABLE users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    email TEXT UNIQUE,
-    password TEXT
+CREATE TABLE users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name text, 
+  email text, 
+  password text,             
+  salt text,    
+  token text,
+  dateLoggedIn DATE,
+  dateCreated DATE
   )`;
+
+const SQL_INSERT_USER = `
+  INSERT INTO users(name, email, password, salt, dateCreated) VALUES (?, ?, ?, ?, ?)`;
 
 const SQL_EVENTS_CREATE = `
 	CREATE TABLE events (
@@ -49,6 +57,11 @@ const database = new sqlite3.Database(DBSOURCE, (err) => {
           // Possivelmente a tabela já foi criada
         } else {
           console.log("Tabela criada com sucesso.");
+
+          if (i === 0) {
+            var salt = bcrypt.genSaltSync(10);
+            database.run(SQL_INSERT_USER, ["teste", "teste@teste.com", bcrypt.hashSync("teste", salt), salt, Date()])
+          }
         }
       });
     }
