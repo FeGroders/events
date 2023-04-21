@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Login</h1>
+    <p>Insira seu email e senha para entrar</p>
+    <form action="javascript:login()">
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email"><br>
+        <label for="password">Senha</label>
+        <input type="password" name="password" id="password"><br>
+        <button type="submit">Entrar</button>
+        <a href="register.html">Registrar-se</a>
+        <p id="error"></p>
+    </form>
+</body>
+<script>
+    function login() {
+        console.log('login');
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const data = {
+            Email: email,
+            Password: password
+        }
+        if (!email || !password) {
+            document.getElementById('error').innerText = 'Preencha todos os campos';
+            return;
+        }
+        fetch('http://localhost:4000/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            console.log(response);
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                document.getElementById('error').innerText = 'Usuário ou senha incorretos';
+            }
+        })
+        .then(data => {
+            if (data.token) {
+                localStorage.setItem('token', data.token);
+                window.location.href = '../index.html';
+            }
+        })
+        .catch(error => {
+            console.error(error);
+        })
+    }
+</script>
+</html>

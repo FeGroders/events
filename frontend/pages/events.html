@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h2>Eventos disponíveis</h2>
+    <table id="events">
+        <tr>
+            <th>Nome</th>
+            <th>Descrição</th>
+            <th>Data</th>
+            <th>Local</th>
+            <th></th>
+        </tr>
+    </table>
+</body>
+<script>
+    fetch('http://localhost:4000/api/events')
+        .then(response => {
+            console.log(response);
+            return response.json();
+        })
+        .then(data => {
+            // if data > 0
+            if (data.length > 0){
+                let events = '';
+                data.forEach(event => {
+                    events += `
+                        <tr>
+                            <td>${event.name}</td>
+                            <td>${event.description}</td>
+                            <td>${event.date}</td>
+                            <td>${event.location}</td>
+                            <td><a href="">Se inscrever</a></td>
+                        </tr>
+                    `;
+                });
+                document.getElementById('events').innerHTML += events;
+            } else {
+                document.getElementById('events').innerHTML = 'Não há eventos disponíveis';
+            }
+    })
+        .catch(error => {
+            console.error(error);
+        })
+</script>
+
+</html>
