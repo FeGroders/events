@@ -6,12 +6,25 @@ import auth from "../middlewares/auth";
 const registrationsRouter = express.Router();
 
 registrationsRouter.post("/registrations", auth, (req, res) => {
-  const registration: Registration = req.body;
-  registrationsRepository.create(registration, (id) => {
-    if (id) {
-      res.status(201).location(`/registrations/${id}`).send();
-    } else {
-      res.status(400).send();
+  const { userID, eventID } = req.body;
+
+  registrationsRepository.readUserRegistrations(userID, (registrations) => {
+    if (registrations) {
+      const registration = registrations.find(
+        (registration) => registration.eventID === eventID
+      );
+      if (registration) {
+        res.status(400).send('{ "message": "User already registered" }');
+        return;
+      } else {
+        registrationsRepository.create(userID, eventID, (id) => {
+          if (id) {
+            res.status(201).send('{ "message": "Success" }');
+          } else {
+            res.status(400).send('{ "message": "Error" }');
+          }
+        });
+      }
     }
   });
 });
@@ -64,13 +77,13 @@ registrationsRouter.delete("/registrations/:id", auth, (req, res) => {
   });
 });
 
-registrationsRouter.post("/checkIn/:id", auth, (req, res) => {
-  const id: number = +req.params.id;
-  registrationsRepository.checkIn(id, (notFound) => {
+registrationsRouter.post("/checkIn", (req, res) => {
+  const { userEmail, eventID } = req.body;
+  registrationsRepository.checkIn(eventID, userEmail, (notFound) => {
     if (notFound) {
-      res.status(404).send();
+      res.status(404).send('{ "error": "Error" }');
     } else {
-      res.status(204).send();
+      res.status(201).send('{ "message": "Success" }');
     }
   });
 });

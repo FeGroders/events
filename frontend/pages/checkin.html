@@ -4,9 +4,87 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Check-In</title>
 </head>
 <body>
-    e
+    <h2>Check-In</h2>
+    <form action="javascript:checkIn()">
+        <label for="event">Evento</label><br>
+        <div id="event"></div>
+        <label for="email">Email do usuário</label><br>
+        <input type="email" id="email"><br>
+        <p id="error"></p>
+        <button type="submit">Check-In</button>
+    </form>
+    <button onclick="window.location.href = '../index.html'">Voltar</button>
 </body>
+<script>
+    function checkIn() {
+        document.getElementById('error').innerHTML = '';
+        if (!document.querySelector('input[name="event"]:checked')) {
+            document.getElementById('error').innerHTML = 'Selecione um evento';
+            return;    
+        }
+
+        var eventID = document.querySelector('input[name="event"]:checked').value;
+        var userEmail = document.getElementById('email').value;
+        if (!eventID) {
+            document.getElementById('error').innerHTML = 'Selecione um evento';
+            return;
+        }
+        if (!userEmail) {
+            document.getElementById('error').innerHTML = 'Digite um email';
+            return;
+        }
+        fetch(`http://localhost:4000/api/checkIn`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                eventID: eventID,
+                userEmail: userEmail
+            })
+        })
+        .then(response => {
+            console.log(response);
+            return response.json();
+        })
+        .then(data => {
+            console.log('data', data);
+            if (data.error) {
+                document.getElementById('error').innerHTML = 'Erro ao realizar check-in';
+            } else {
+                document.getElementById('error').innerHTML = 'Check-in realizado com sucesso';
+            }
+        })
+
+    }
+
+    fetch(`http://localhost:4000/api/events`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-access-token': localStorage.getItem('token')
+        },
+    })
+    .then(response => {
+        return response.json();
+    })
+    .then(data => {
+        if (data.length > 0){
+            let events = '';
+            data.forEach(event => {
+                events += `<input type="radio" name="event" value="${event.id}">${event.name}<br>`;
+            });
+            document.getElementById('event').innerHTML += events;
+        } else {
+            document.getElementById('event').innerHTML = 'Não há eventos disponíveis';
+        }
+    })
+    .catch(error => {
+        console.log(error);
+    });
+
+</script>
 </html>

@@ -33,16 +33,16 @@ const SQL_INSERT_EVENT = `
 const SQL_REGISTRATIONS_CREATE = `
   CREATE TABLE registrations (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER,
-    event_id INTEGER,
+    userID INTEGER,
+    eventID INTEGER,
     presence INTEGER,
 
-    FOREIGN KEY (user_id) REFERENCES users (id),
-    FOREIGN KEY (event_id) REFERENCES events (id)
+    FOREIGN KEY (userID) REFERENCES users (id),
+    FOREIGN KEY (eventID) REFERENCES events (id)
   )`;
 
 const SQL_INSERT_REGISTRATION = `
-  INSERT INTO registrations(user_id, event_id, presence) VALUES (?, ?, ?)`;
+  INSERT INTO registrations(userID, eventID, presence) VALUES (?, ?, ?)`;
 
 const listExecSQL = [
   SQL_USERS_CREATE,
@@ -70,6 +70,8 @@ const database = new sqlite3.Database(DBSOURCE, (err) => {
             console.log("Usuário de teste criado com sucesso.")
           } else if (i === 1) {
             database.run(SQL_INSERT_EVENT, ["Evento de teste", "Evento de teste", "2023-08-01", "Local de teste"])
+            database.run(SQL_INSERT_EVENT, ["Evento de teste 2", "Evento de teste 2", "2023-08-01", "Local de teste 2"])
+            database.run(SQL_INSERT_EVENT, ["Evento de teste 3", "Evento de teste 3", "2023-08-01", "Local de teste 3"])
             console.log("Evento de teste criado com sucesso.")
           } else if (i === 2) {
             database.run(SQL_INSERT_REGISTRATION, [1, 1, 0]);

@@ -17,6 +17,7 @@
         <button type="submit">Entrar</button>
         <a href="register.html">Registrar-se</a>
         <p id="error"></p>
+        <button onclick="window.location.href = '../index.html'">Voltar</button>
     </form>
 </body>
 <script>
@@ -49,6 +50,7 @@
         })
         .then(data => {
             if (data.token) {
+                localStorage.setItem('userID', data.id);
                 localStorage.setItem('token', data.token);
                 window.location.href = '../index.html';
             }

@@ -1,71 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Inscrições</title>
 </head>
-
 <body>
-    <h2>Eventos disponíveis</h2>
+    <h2>Inscrições</h2>
     <table id="events">
         <tr>
             <th>Nome</th>
             <th>Descrição</th>
             <th>Data</th>
             <th>Local</th>
-            <th></th>
         </tr>
     </table>
     <button onclick="window.location.href = '../index.html'">Voltar</button>
 </body>
 <script>
-    function register(eventID){
+    if (!localStorage.getItem('token')) {
+        window.location.href = 'login.html';
+    }
+
+    function getRegistrations() {
         var userID = localStorage.getItem('userID');
 
-        if (!localStorage.getItem('token')) {
-            window.location.href = 'login.html';
-        }
-
-        fetch(`http://localhost:4000/api/registrations`, {
-            method: 'POST',
+        fetch(`http://localhost:4000/api/registrations/user/${userID}`, {
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'x-access-token': localStorage.getItem('token')
             },
-            body: JSON.stringify({
-                userID: userID,
-                eventID: eventID
-            })
         })
-        .then(response => {
-            if (response.status == 401) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('userID');
-                window.location.href = 'login.html';
-            }
-            return response.json();  
-        })
-        .then(data => {
-            console.log('data',data);
-            if (data.message == 'Error'){
-                alert('Erro ao se inscrever no evento');
-            } else if (data.message == 'Success') {
-                alert('Inscrição realizada com sucesso');
-                document.getElementById(`register${eventID}`).disabled = true;
-            } else {
-                alert('Você já está inscrito neste evento');
-                document.getElementById(`register${eventID}`).disabled = true;
-            }
-        })
-        .catch(error => {
-            console.error(error);
-        })
-    }
-
-    fetch('http://localhost:4000/api/events')
         .then(response => {
             if (response.status == 401) {
                 localStorage.removeItem('token');
@@ -75,7 +42,7 @@
             return response.json();
         })
         .then(data => {
-            // if data > 0
+            console.log(data);
             if (data.length > 0){
                 let events = '';
                 data.forEach(event => {
@@ -85,7 +52,6 @@
                             <td>${event.description}</td>
                             <td>${event.date}</td>
                             <td>${event.location}</td>
-                            <td><button id="register${event.id}" onclick="register(${event.id})">Inscrever-se</button></td>
                         </tr>
                     `;
                 });
@@ -93,10 +59,11 @@
             } else {
                 document.getElementById('events').innerHTML = 'Não há eventos disponíveis';
             }
-    })
+        })
         .catch(error => {
             console.error(error);
-        })
+        })        
+    }
+    getRegistrations();
 </script>
-
 </html>
