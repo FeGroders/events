@@ -38,6 +38,18 @@ const usersRepository = {
       }
     });
   },
+
+  getUserEmail: (id: number, callback: (email?: string) => void) => {
+    const sql = "SELECT email FROM users WHERE id = ?";
+    database.get(sql, [id], (err, row) => {
+      if (err) {
+        console.log(err.message);
+        callback();
+      } else {
+        callback(row.email);
+      }
+    });
+  }
 };
 
 export default usersRepository;

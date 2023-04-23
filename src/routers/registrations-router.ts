@@ -1,7 +1,8 @@
 import express from "express";
-import Registration from "../models/registration";
 import registrationsRepository from "../repositories/registrations-repository";
 import auth from "../middlewares/auth";
+import emailSender from "../email";
+import usersRepository from "../repositories/users-repository";
 
 const registrationsRouter = express.Router();
 
@@ -19,6 +20,11 @@ registrationsRouter.post("/registrations", auth, (req, res) => {
       } else {
         registrationsRepository.create(userID, eventID, (id) => {
           if (id) {
+            usersRepository.getUserEmail(userID, (email) => {
+              if (email) {
+                emailSender.sendEmail(email, 'Inscrição realizada com sucesso', 'Sua inscrição foi realizada com sucesso');
+              }
+            });
             res.status(201).send('{ "message": "Success" }');
           } else {
             res.status(400).send('{ "message": "Error" }');
@@ -83,6 +89,7 @@ registrationsRouter.post("/checkIn", (req, res) => {
     if (notFound) {
       res.status(404).send('{ "error": "Error" }');
     } else {
+      emailSender.sendEmail(userEmail, 'Check-in realizado com sucesso', 'Seu check-in foi realizado com sucesso');
       res.status(201).send('{ "message": "Success" }');
     }
   });

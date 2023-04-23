@@ -3,6 +3,7 @@ import User from "../models/user";
 import usersRepository from "../repositories/users-repository";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import emailSender from "../email";
 require("dotenv").config();
 
 const usersRouter = express.Router();
@@ -74,6 +75,7 @@ usersRouter.post("/register", async (req, res) => {
 
         usersRepository.register(user, (id) => {
           if (id) {
+            emailSender.sendEmail(user.email, 'Inscrição realizada com sucesso', 'Sua inscrição foi realizada com sucesso');
             res.status(201).json("Success");
           } else {
             res.status(400).json({ error: "Error registering user" });

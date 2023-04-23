@@ -71,14 +71,6 @@ const registrationsRepository = {
     });
   },
 
-  // checkIn: (id: number, callback: (notFound: boolean) => void) => {
-  //   const sql = "UPDATE registrations SET presence = 1 WHERE id = ?";
-  //   const params = [id];
-  //   database.run(sql, params, function (_err) {
-  //     callback(this.changes === 0);
-  //   });
-  // },
-
   checkIn: (eventID : number, userEmail : string, callback: (notFound: boolean) => void) => {
     const sql = "UPDATE registrations SET presence = 1 WHERE eventID = ? AND userID = (SELECT id FROM users WHERE email = ?)";
     const params = [eventID, userEmail];

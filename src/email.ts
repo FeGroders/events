@@ -6,7 +6,6 @@ require("dotenv").config();
 
 const emailSender = {
   sendEmail: function (
-    from: string,
     to: string,
     subject: string,
     text: string
@@ -23,7 +22,7 @@ const emailSender = {
     });
 
     var emailASerEnviado = {
-      from: from,
+      from: process.env.EMAIL_USER,
       to: to,
       subject: subject,
       text: text,
