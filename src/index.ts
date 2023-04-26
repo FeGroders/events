@@ -1,6 +1,8 @@
 import cors from "cors";
 import express from "express";
 import serverless from "serverless-http";
+import swaggerUi from "swagger-ui-express";
+import swaggerJsDoc from "swagger-jsdoc";
 import eventsRouter from "./routers/events-router";
 import registrationsRouter from "./routers/registrations-router";
 import usersRouter from "./routers/users-router";
@@ -11,8 +13,28 @@ const PORT = process.env.PORT || 4000;
 // Host do servidor
 const HOSTNAME = process.env.HOSTNAME || "http://localhost";
 
+const options = {
+  definition: {
+    openapi: "3.0.1",
+    info: {
+      title: "REST API for Swagger Documentation",
+      version: "1.0.0",
+    },
+    schemes: ["http", "https"],
+    servers: [{ url: "http://localhost:4000/api" }],
+  },
+  apis: [
+    "./src/routers/events-router.ts",
+    "./src/routers/registrations-router.ts",
+    "./src/routers/users-router.ts",
+  ],
+};
+
 // App Express
 const app = express();
+
+const swaggerSpec = swaggerJsDoc(options);
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // JSON
 app.use(express.json());

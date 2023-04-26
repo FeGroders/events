@@ -8,6 +8,39 @@ require("dotenv").config();
 
 const usersRouter = express.Router();
 
+/**
+ * @swagger
+ * /login:
+ *      post:
+ *          tags:
+ *             - Users
+ *          summary: Login to the server
+ *          description: Login to the server
+ *          requestBody:
+ *             required: true
+ *             content:
+ *              application/json:
+ *                schema:
+ *                  type: object
+ *                  properties:
+ *                    Email:
+ *                      type: string
+ *                    Password:
+ *                      type: string
+ *          responses:
+ *            200:
+ *                  description: Success
+ *                  content:
+ *                      application/json:
+ *                          schema:
+ *                              type: object
+ *                              properties:
+ *                                  token:
+ *                                      type: string
+ *            400:
+ *              description: Error
+ * description: Internal Server Error
+ */
 usersRouter.post("/login", async (req, res) => {
   try {
     var TOKEN_KEY = process.env.TOKEN_KEY ? process.env.TOKEN_KEY : "";
@@ -45,6 +78,34 @@ usersRouter.post("/login", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /register:
+ *      post:
+ *          tags:
+ *             - Users 
+ *          summary: Register user
+ *          description: Register user
+ *          requestBody:
+ *             required: true
+ *             content:
+ *              application/json:
+ *                schema:
+ *                  type: object
+ *                  properties:
+ *                    Name:
+ *                     type: string
+ *                    Email:
+ *                     type: string
+ *                    Password:
+ *                     type: string
+ *          responses:
+ *            201:
+ *                  description: Success
+ *            400:
+ *              description: Error
+ * description: Internal Server Error
+ */
 usersRouter.post("/register", async (req, res) => {
   var errors = [];
   try {
@@ -75,7 +136,11 @@ usersRouter.post("/register", async (req, res) => {
 
         usersRepository.register(user, (id) => {
           if (id) {
-            emailSender.sendEmail(user.email, 'Inscrição realizada com sucesso', 'Sua inscrição foi realizada com sucesso');
+            emailSender.sendEmail(
+              user.email,
+              "Inscrição realizada com sucesso",
+              "Sua inscrição foi realizada com sucesso"
+            );
             res.status(201).json("Success");
           } else {
             res.status(400).json({ error: "Error registering user" });
