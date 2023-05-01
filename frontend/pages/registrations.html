@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscrições</title>
 </head>
+
 <body>
     <h2>Inscrições</h2>
     <table id="events">
@@ -14,6 +16,8 @@
             <th>Descrição</th>
             <th>Data</th>
             <th>Local</th>
+            <th></th>
+            <th></th>
         </tr>
     </table>
     <button onclick="window.location.href = '../index.html'">Voltar</button>
@@ -21,6 +25,31 @@
 <script>
     if (!localStorage.getItem('token')) {
         window.location.href = 'login.html';
+    }
+
+    function generateCertificate(eventID) {
+        let url = `http://localhost:4000/api/certificates/`;
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-access-token': localStorage.getItem('token')
+            },
+            body: JSON.stringify({
+                userID: localStorage.getItem('userID'),
+                eventID: eventID,
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                if (data.length = 0) {
+                    alert(`Certificado gerado com sucesso
+                           Código: ${data.md5}`);
+                } else {
+                    alert('Erro ao gerar certificado');
+                }
+            })
     }
 
     function getRegistrations() {
@@ -33,37 +62,38 @@
                 'x-access-token': localStorage.getItem('token')
             },
         })
-        .then(response => {
-            if (response.status == 401) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('userID');
-                window.location.href = 'login.html';
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log(data);
-            if (data.length > 0){
-                let events = '';
-                data.forEach(event => {
-                    events += `
+            .then(response => {
+                if (response.status == 401) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('userID');
+                    window.location.href = 'login.html';
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.length > 0) {
+                    let events = '';
+                    data.forEach(event => {
+                        events += `
                         <tr>
                             <td>${event.name}</td>
                             <td>${event.description}</td>
                             <td>${event.date}</td>
                             <td>${event.location}</td>
+                            <td><button onclick="javascript:generateCertificate(${event.id})">Gerar certificado</button></td>
                         </tr>
                     `;
-                });
-                document.getElementById('events').innerHTML += events;
-            } else {
-                document.getElementById('events').innerHTML = 'Não há eventos disponíveis';
-            }
-        })
-        .catch(error => {
-            console.error(error);
-        })        
+                    });
+                    document.getElementById('events').innerHTML += events;
+                } else {
+                    document.getElementById('events').innerHTML = 'Não há eventos disponíveis';
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            })
     }
     getRegistrations();
 </script>
+
 </html>

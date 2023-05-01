@@ -6,6 +6,7 @@ import swaggerJsDoc from "swagger-jsdoc";
 import eventsRouter from "./routers/events-router";
 import registrationsRouter from "./routers/registrations-router";
 import usersRouter from "./routers/users-router";
+import certificatesRouter from "./routers/certificates-router";
 
 // Porta do servidor
 const PORT = process.env.PORT || 4000;
@@ -27,6 +28,7 @@ const options = {
     "./src/routers/events-router.ts",
     "./src/routers/registrations-router.ts",
     "./src/routers/users-router.ts",
+    "./src/routers/certificates-router.ts",
   ],
 };
 
@@ -57,6 +59,7 @@ const routerPrefix = "/api";
 app.use(routerPrefix, eventsRouter);
 app.use(routerPrefix, registrationsRouter);
 app.use(routerPrefix, usersRouter);
+app.use(routerPrefix, certificatesRouter);
 
 // Resposta padrão para quaisquer outras requisições:
 app.use((req, res) => {
