@@ -18,6 +18,7 @@
             <th>Local</th>
             <th></th>
             <th></th>
+            <p id="error"></p>
         </tr>
     </table>
     <button onclick="window.location.href = '../index.html'">Voltar</button>
@@ -40,14 +41,18 @@
                 eventID: eventID,
             })
         })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                if (data.length = 0) {
-                    alert(`Certificado gerado com sucesso
-                           Código: ${data.md5}`);
-                } else {
+            .then(response => {
+                if (response.status >= 400) {
                     alert('Erro ao gerar certificado');
+                    document.getElementById('error').innerHTML = 'Erro ao gerar certificado';
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.md5) {
+                    alert(`Certificado gerado com sucesso
+                            Código: ${data.md5}`);
+                    document.getElementById('error').innerHTML = data.md5;
                 }
             })
     }

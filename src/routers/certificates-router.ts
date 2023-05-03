@@ -3,6 +3,7 @@ import certificatesRepository from "../repositories/certificates-repository";
 import auth from "../middlewares/auth";
 import emailSender from "../email";
 import usersRepository from "../repositories/users-repository";
+import registrationsRepository from "../repositories/registrations-repository";
 
 const certificatesRouter = express.Router();
 
@@ -35,36 +36,56 @@ const certificatesRouter = express.Router();
 certificatesRouter.post("/certificates", auth, (req, res) => {
   const { userID, eventID } = req.body;
 
-  certificatesRepository.readUserCertificates(userID, (certificates) => {
-    if (certificates) {
-      const certificate = certificates.find(
-        (certificate) => certificate.eventID === eventID
+  function sendEmail(email: string, md5: string) {
+    emailSender.sendEmail(
+      email,
+      "Certificado gerado com sucesso",
+      "Seu certificado foi gerado com sucesso. Para validar seu certificado utilize o seguinte código: " +
+        md5
+    );
+  }
+
+  registrationsRepository.readUserRegistrations(userID, (registrations) => {
+    if (registrations) {
+      const registration = registrations.find(
+        (registration) =>
+          registration.eventID === eventID && registration.presence == true
       );
-      if (certificate) {
-        res.status(400).send(certificate);
-        return;
-      } else {
-        certificatesRepository.create(userID, eventID, (id) => {
-          if (id) {
+      if (registration) {
+        certificatesRepository.readUserCertificates(userID, (certificates) => {
+          if (certificates) {
             const certificate = certificates.find(
-              (certificate) => certificate.id === id
+              (certificate) => certificate.eventID === eventID
             );
-            usersRepository.getUserEmail(userID, (email) => {
-              if (email && certificate) {
-                emailSender.sendEmail(
-                  email,
-                  "Certificado gerado com sucesso",
-                  "Seu certificado foi gerado com sucesso. Para validar seu certificado utilize o seguinte " +
-                    "código: " +
-                    certificate.md5
-                );
-              }
-            });
-            res.status(201).send(certificate);
-          } else {
-            res.status(400).send('{ "message": "Error" }');
+            if (certificate) {
+              usersRepository.getUserEmail(userID, (email) => {
+                if (email && certificate) {
+                  sendEmail(email, certificate.md5);
+                }
+              });
+              res.status(200).send(certificate);
+              return;
+            } else {
+              certificatesRepository.create(userID, eventID, (id) => {
+                if (id) {
+                  const certificate = certificates.find(
+                    (certificate) => certificate.id === id
+                  );
+                  usersRepository.getUserEmail(userID, (email) => {
+                    if (email && certificate) {
+                      sendEmail(email, certificate.md5);
+                    }
+                  });
+                  res.status(201).send(certificate);
+                } else {
+                  res.status(400).send('{ "message": "Error" }');
+                }
+              });
+            }
           }
         });
+      } else {
+        res.status(400).send('{ "message": "User was not present" }');
       }
     }
   });
