@@ -49,7 +49,10 @@ const SQL_CERTIFICATES_CREATE = `
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     userID INTEGER,
     eventID INTEGER,
-    md5 TEXT UNIQUE
+    md5 TEXT UNIQUE,
+
+    FOREIGN KEY (userID) REFERENCES users (id),
+    FOREIGN KEY (eventID) REFERENCES events (id)
   )`;
 
 const SQL_INSERT_CERTIFICATE = `
