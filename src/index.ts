@@ -7,6 +7,7 @@ import eventsRouter from "./routers/events-router";
 import registrationsRouter from "./routers/registrations-router";
 import usersRouter from "./routers/users-router";
 import certificatesRouter from "./routers/certificates-router";
+const axios = require('axios');
 
 // Porta do servidor
 const PORT = process.env.PORT || 4000;
