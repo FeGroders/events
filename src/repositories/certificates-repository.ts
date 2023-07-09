@@ -26,13 +26,13 @@ const certificatesRepository = {
   readAll: (callback: (certificates: Certificate[]) => void) => {
     const sql = "SELECT * FROM certificates";
     const params: any[] = [];
-    database.all(sql, params, (_err, rows) => callback(rows));
+    database.all(sql, params, (_err, rows: Certificate[]) => callback(rows));
   },
 
   read: (id: number, callback: (certificate?: Certificate) => void) => {
     const sql = "SELECT * FROM certificates WHERE id = ?";
     const params = [id];
-    database.get(sql, params, (_err, row) => callback(row));
+    database.get(sql, params, (_err, row: Certificate) => callback(row));
   },
 
   readUserCertificates: (
@@ -42,13 +42,13 @@ const certificatesRepository = {
     const sql =
       "SELECT * FROM certificates WHERE userID = ? ORDER BY eventID DESC";
     const params = [userID];
-    database.all(sql, params, (_err, row) => callback(row));
+    database.all(sql, params, (_err, row: Certificate[]) => callback(row));
   },
 
   readByMd5: (md5: string, callback: (certificate?: Certificate) => void) => {
     const sql = "SELECT * FROM certificates WHERE md5 = ?";
     const params = [md5];
-    database.get(sql, params, (_err, row) => callback(row));
+    database.get(sql, params, (_err, row: Certificate) => callback(row));
   },
   
   delete: (id: number, callback: (notFound: boolean) => void) => {

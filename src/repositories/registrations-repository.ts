@@ -18,13 +18,13 @@ const registrationsRepository = {
   readAll: (callback: (registrations: Registration[]) => void) => {
     const sql = "SELECT * FROM registrations";
     const params: any[] = [];
-    database.all(sql, params, (_err, rows) => callback(rows));
+    database.all(sql, params, (_err, rows: Registration[]) => callback(rows));
   },
 
   read: (id: number, callback: (registration?: Registration) => void) => {
     const sql = "SELECT * FROM registrations WHERE id = ?";
     const params = [id];
-    database.get(sql, params, (_err, row) => callback(row));
+    database.get(sql, params, (_err, row: Registration) => callback(row));
   },
 
   readUserRegistrations: (
@@ -33,7 +33,7 @@ const registrationsRepository = {
   ) => {
     const sql = "SELECT * FROM registrations, events WHERE userID = ? AND events.id = registrations.eventID";
     const params = [userID];
-    database.all(sql, params, (_err, row) => callback(row));
+    database.all(sql, params, (_err, row: Registration[]) => callback(row));
   },
 
   readUserRegistrationEmail: (
@@ -42,7 +42,7 @@ const registrationsRepository = {
   ) => {
     const sql = "SELECT * FROM registrations, events, users WHERE users.email = ? AND users.id = registrations.userID AND events.id = registrations.eventID";
     const params = [userEmail];
-    database.all(sql, params, (_err, row) => callback(row));
+    database.all(sql, params, (_err, row: Registration[]) => callback(row));
   },
 
   update: (

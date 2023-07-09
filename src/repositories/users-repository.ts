@@ -17,7 +17,7 @@ const usersRepository = {
 
   readUser: (email: string, callback: (user?: User) => void) => {
     const sql = "SELECT * FROM users WHERE email = ?";
-    database.get(sql, [email], (err, row) => {
+    database.get(sql, [email], (err, row: User) => {
       if (err) {
         console.log(err.message);
         callback();
@@ -29,7 +29,7 @@ const usersRepository = {
 
   readAll: (callback: (users: User[]) => void) => {
     const sql = "SELECT * FROM users";
-    database.all(sql, [], (err, rows) => {
+    database.all(sql, [], (err, rows: User[]) => {
       if (err) {
         console.log(err.message);
         callback([]);
@@ -41,7 +41,7 @@ const usersRepository = {
 
   getUserEmail: (id: number, callback: (email?: string) => void) => {
     const sql = "SELECT email FROM users WHERE id = ?";
-    database.get(sql, [id], (err, row) => {
+    database.get(sql, [id], (err, row: User) => {
       if (err) {
         console.log(err.message);
         callback();

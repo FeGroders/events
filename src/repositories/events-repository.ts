@@ -13,13 +13,13 @@ const eventsRepository = {
   readAll: (callback: (events: Event[]) => void) => {
     const sql = "SELECT * FROM events";
     const params: any[] = [];
-    database.all(sql, params, (_err, rows) => callback(rows));
+    database.all(sql, params, (_err, rows: Event[]) => callback(rows));
   },
 
   read: (id: number, callback: (event?: Event) => void) => {
     const sql = "SELECT * FROM events WHERE id = ?";
     const params = [id];
-    database.get(sql, params, (_err, row) => callback(row));
+    database.get(sql, params, (_err, row: Event) => callback(row));
   },
 
   update: (id: number, event: Event, callback: (notFound: boolean) => void) => {
