@@ -1,29 +1,34 @@
-FROM alpine:3.13.5
+# FROM alpine:3.13.5
 
-# #Build process
-# FROM node:16-alpine as builder
+RUN curl -fsSLO https://get.docker.com/builds/Linux/x86_64/docker-17.04.0-ce.tgz \
+  && tar xzvf docker-17.04.0-ce.tgz \
+  && mv docker/docker /usr/local/bin \
+  && rm -r docker docker-17.04.0-ce.tgz
 
-# WORKDIR /app
+#Build process
+FROM node:16-alpine as builder
 
-# COPY package.json .
-# COPY package-lock.json .
+WORKDIR /app
 
-# RUN npm install
+COPY package.json .
+COPY package-lock.json .
 
-# COPY . .
+RUN npm install
 
-# RUN npm run build
+COPY . .
 
-# #Production process
-# FROM node:16-alpine
+RUN npm run build
 
-# WORKDIR /app
+#Production process
+FROM node:16-alpine
 
-# COPY package.json .
+WORKDIR /app
 
-# RUN npm install --only=production
+COPY package.json .
 
-# COPY --from=builder /app/dist ./dist
+RUN npm install --only=production
 
-# EXPOSE 4000
-# CMD ["npm","run","start"]
+COPY --from=builder /app/dist ./dist
+
+EXPOSE 4000
+CMD ["npm","run","start"]
