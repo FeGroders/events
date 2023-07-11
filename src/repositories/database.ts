@@ -88,7 +88,7 @@ const version2 = {
   ],
 };
 
-const VERSION = 2;
+const VERSION = 1;
 const listVersions = [version1, version2];
 
 function createDefaultData() {
