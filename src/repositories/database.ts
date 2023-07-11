@@ -86,8 +86,8 @@ const version2 = {
   ],
 };
 
-const VERSION = 1;
-const listVersions = [version1];
+const VERSION = 2;
+const listVersions = [version1, version2];
 
 function createDefaultData() {
   var salt = bcrypt.genSaltSync(10);
