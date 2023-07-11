@@ -92,15 +92,16 @@ const version2 = {
   ],
 };
 
-// const version3 = {
-//   version: 3,
-//   execSQL: [
-//     "CREATE TABLE tipo_x (id INTEGER PRIMARY KEY AUTOINCREMENT, descricao TEXT)",
-//   ],
-// };
+const version3 = {
+  version: 3,
+  execSQL: [
+    "CREATE TABLE tipo_x (id INTEGER PRIMARY KEY AUTOINCREMENT, descricao TEXT)",
+    `INSERT INTO events(name, description, date, location) VALUES ("Evento de teste222", "Evento de teste2222", "2023-08-01", "Local de teste")`,
+  ],
+};
 
-const VERSION = 2;
-const listVersions = [version1, version2];
+const VERSION = 3;
+const listVersions = [version1, version2, version3];
 
 const database = new sqlite3.Database(DBSOURCE, (err) => {
   if (err) {

@@ -23,7 +23,7 @@
         var erro = document.getElementById('error');
         erro.innerHTML = '';
         let certificado = document.getElementById('certificado').value;
-        let url = `http://localhost:4000/api/certificates/validate`;
+        let url = `http://localhost:4040/api/certificates/validate`;
         fetch(url, {
             method: 'POST',
             headers: {
