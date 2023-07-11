@@ -6,7 +6,9 @@ const SQL_VERSION_CREATE = `
 CREATE TABLE version (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   version INTEGER
-)`;
+);
+
+INSERT INTO version(version) VALUES (1);`;
 
 const SQL_USERS_CREATE = `
 CREATE TABLE users (
@@ -18,7 +20,7 @@ CREATE TABLE users (
   token text,
   dateLoggedIn DATE,
   dateCreated DATE
-  )`;
+  );`;
 
 const SQL_INSERT_USER = `
   INSERT INTO users(name, email, password, salt, dateCreated) VALUES (?, ?, ?, ?, ?)`;
@@ -30,7 +32,12 @@ const SQL_EVENTS_CREATE = `
 		description TEXT,
 		date TEXT,
 		location TEXT
-	)`;
+	);
+  
+  INSERT INTO events(name, description, date, location) VALUES ('Evento de teste', 'Evento de teste', '2023-08-01', 'Local de teste');
+  INSERT INTO events(name, description, date, location) VALUES ('Evento de teste 2', 'Evento de teste 2', '2023-08-01', 'Local de teste 2');
+  INSERT INTO events(name, description, date, location) VALUES ('Evento de teste 3', 'Evento de teste 3', '2023-08-01', 'Local de teste 3');
+  `;
 
 const SQL_INSERT_EVENT = `
     INSERT INTO events(name, description, date, location) VALUES (?, ?, ?, ?)`;
@@ -69,16 +76,17 @@ const SQL_INSERT_VERSION = `
 const SQL_UPDATE_VERSION = `
   UPDATE version SET version = ?`;
 
-const version1 = {
-  version: 1,
-  execSQL: [
+  const listExecSQL = [
     SQL_VERSION_CREATE,
-    SQL_INSERT_VERSION,
     SQL_USERS_CREATE,
     SQL_EVENTS_CREATE,
     SQL_REGISTRATIONS_CREATE,
     SQL_CERTIFICATES_CREATE,
-  ]
+  ];
+  
+const version1 = {
+  version: 1,
+  execSQL: []
 };
 
 const version2 = {
@@ -91,23 +99,6 @@ const version2 = {
 const VERSION = 1;
 const listVersions = [version1, version2];
 
-function createDefaultData() {
-  var salt = bcrypt.genSaltSync(10);
-  database.run(SQL_INSERT_USER, ["teste", "teste@teste.com", bcrypt.hashSync("teste", salt), salt, Date()])
-  console.log("Usuário de teste criado com sucesso.")
-
-  database.run(SQL_INSERT_EVENT, ["Evento de teste", "Evento de teste", "2023-08-01", "Local de teste"])
-  database.run(SQL_INSERT_EVENT, ["Evento de teste 2", "Evento de teste 2", "2023-08-01", "Local de teste 2"])
-  database.run(SQL_INSERT_EVENT, ["Evento de teste 3", "Evento de teste 3", "2023-08-01", "Local de teste 3"])
-  console.log("Evento de teste criado com sucesso.")
-
-  database.run(SQL_INSERT_REGISTRATION, [1, 1, 0]);
-  console.log("Inscrição de teste criada com sucesso.")
-
-  database.run(SQL_INSERT_CERTIFICATE, [1, 1, require('crypto').createHash('md5').update("1-1").digest("hex")]);
-  console.log("Certificado de teste criado com sucesso.")
-}
-
 const database = new sqlite3.Database(DBSOURCE, (err) => {
   if (err) {
     console.error(err.message);
@@ -115,34 +106,50 @@ const database = new sqlite3.Database(DBSOURCE, (err) => {
   } else {    
     console.log("Base de dados conectada com sucesso.");
 
+    for (let i = 0; i < listExecSQL.length; i++) {
+      database.run(listExecSQL[i], (err) => {
+        if (err) {
+          // Possivelmente a tabela já foi criada
+        } else {
+          console.log("Tabela criada com sucesso.");
+
+          if (i === listExecSQL.length - 1) {
+            var salt = bcrypt.genSaltSync(10);
+
+            database.run(SQL_INSERT_VERSION)
+            database.run(SQL_INSERT_USER, ["teste", "teste@teste.com", bcrypt.hashSync("teste", salt), salt, Date()])
+            console.log("Usuário de teste criado com sucesso.")
+          
+            database.run(SQL_INSERT_EVENT, ["Evento de teste", "Evento de teste", "2023-08-01", "Local de teste"])
+            database.run(SQL_INSERT_EVENT, ["Evento de teste 2", "Evento de teste 2", "2023-08-01", "Local de teste 2"])
+            database.run(SQL_INSERT_EVENT, ["Evento de teste 3", "Evento de teste 3", "2023-08-01", "Local de teste 3"])
+            console.log("Evento de teste criado com sucesso.")
+
+            database.run(SQL_INSERT_REGISTRATION, [1, 1, 0]);
+            console.log("Inscrição de teste criada com sucesso.")
+
+            database.run(SQL_INSERT_CERTIFICATE, [1, 1, require('crypto').createHash('md5').update("1-1").digest("hex")]);
+            console.log("Certificado de teste criado com sucesso.")
+          }
+        }
+      });
+    }
+
     var dbVersion = 0;
     database.get("SELECT version FROM version", (err, row: any) => {
       if (err) {
-        if (VERSION == 1) {
-          if (dbVersion < VERSION) {
-            listVersions.forEach((version) => {
-              if (version.version > dbVersion) {
-                version.execSQL.forEach((sql) => {
-                  database.run(sql);
-                });
-              }
-            })
-            console.log("Tabelas criadas com sucesso.");
-            createDefaultData();
-    
-            // UPDATE VERSION
-            database.run(SQL_UPDATE_VERSION, [VERSION]);
-            console.log("Versão da base de dados atualizada com sucesso. Versão atual: " + VERSION);
-          }
-        }
+        console.log("Versão da base de dados não encontrada.");
       } else {
-        console.log("Versão da base de dados encontrada");
-        dbVersion = row.version;
-        
+        if (row != undefined) {
+          dbVersion = row.version;
+        } else {
+          database.run(SQL_INSERT_VERSION, [1]);
+        }
+
         // CREATE TABLES
         if (dbVersion < VERSION) {
           listVersions.forEach((version) => {
-            if (version.version > dbVersion) {
+            if (version.version > dbVersion && version.version <= VERSION) {
               version.execSQL.forEach((sql) => {
                 database.run(sql);
               });
