@@ -133,18 +133,18 @@ const database = new sqlite3.Database(DBSOURCE, (err) => {
         dbVersion = row.version;
 
         // CREATE TABLES
-        listVersions.forEach((version) => {
-          if (version.version > dbVersion) {
-            version.execSQL.forEach((sql) => {
-              database.run(sql);
-            });
-          }
-        });
-        console.log("Tabelas criadas com sucesso.");
-        createDefaultData();
-
-        // UPDATE VERSION
         if (dbVersion < VERSION) {
+          listVersions.forEach((version) => {
+            if (version.version < VERSION) {
+              version.execSQL.forEach((sql) => {
+                database.run(sql);
+              });
+            }
+          })
+          console.log("Tabelas criadas com sucesso.");
+          createDefaultData();
+
+          // UPDATE VERSION
           database.run(SQL_UPDATE_VERSION, [VERSION]);
           console.log("Versão da base de dados atualizada com sucesso.");
         }
