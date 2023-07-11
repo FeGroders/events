@@ -29,7 +29,7 @@
     }
 
     function generateCertificate(eventID) {
-        let url = `http://${window.location.hostname}:${window.location.port}/api/certificates/`;
+        let url = `http://localhost:4000/api/certificates/`;
         fetch(url, {
             method: 'POST',
             headers: {
@@ -60,7 +60,7 @@
     function getRegistrations() {
         var userID = localStorage.getItem('userID');
 
-        fetch(`http://${window.location.hostname}:${window.location.port}/api/registrations/user/${userID}`, {
+        fetch(`http://localhost:4000/api/registrations/user/${userID}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

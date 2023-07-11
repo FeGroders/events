@@ -33,7 +33,7 @@
             document.getElementById('error').innerText = 'Preencha todos os campos';
             return;
         }
-        fetch(`http://${window.location.hostname}:${window.location.port}/api/login`, {
+        fetch(`http://localhost:4000/api/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

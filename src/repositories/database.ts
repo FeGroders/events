@@ -32,12 +32,7 @@ const SQL_EVENTS_CREATE = `
 		description TEXT,
 		date TEXT,
 		location TEXT
-	);
-  
-  INSERT INTO events(name, description, date, location) VALUES ('Evento de teste', 'Evento de teste', '2023-08-01', 'Local de teste');
-  INSERT INTO events(name, description, date, location) VALUES ('Evento de teste 2', 'Evento de teste 2', '2023-08-01', 'Local de teste 2');
-  INSERT INTO events(name, description, date, location) VALUES ('Evento de teste 3', 'Evento de teste 3', '2023-08-01', 'Local de teste 3');
-  `;
+	);`;
 
 const SQL_INSERT_EVENT = `
     INSERT INTO events(name, description, date, location) VALUES (?, ?, ?, ?)`;
@@ -71,7 +66,7 @@ const SQL_INSERT_CERTIFICATE = `
   INSERT INTO certificates(userID, eventID, md5) VALUES (?, ?, ?)`;
 
 const SQL_INSERT_VERSION = `
-  INSERT INTO version(version) VALUES (1)`;
+  INSERT INTO version(version) VALUES (?)`;
 
 const SQL_UPDATE_VERSION = `
   UPDATE version SET version = ?`;
@@ -92,7 +87,7 @@ const version1 = {
 const version2 = {
   version: 2,
   execSQL: [
-    "INSERT INTO events(name, description, date, location) VALUES ('Evento de teste342432432', 'Evento de teste42343', '2023-08-01', 'Local de teste423324')",
+    "CREATE TABLE tipo_x (id INTEGER PRIMARY KEY AUTOINCREMENT, descricao TEXT)",
   ],
 };
 
@@ -117,6 +112,8 @@ const database = new sqlite3.Database(DBSOURCE, (err) => {
             var salt = bcrypt.genSaltSync(10);
 
             database.run(SQL_INSERT_VERSION)
+            console.log("Versão da base de dados criada com sucesso.")
+
             database.run(SQL_INSERT_USER, ["teste", "teste@teste.com", bcrypt.hashSync("teste", salt), salt, Date()])
             console.log("Usuário de teste criado com sucesso.")
           
