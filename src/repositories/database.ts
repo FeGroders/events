@@ -100,7 +100,7 @@ const version3 = {
   ],
 };
 
-const VERSION = 3;
+const VERSION = 2;
 const listVersions = [version1, version2, version3];
 
 const database = new sqlite3.Database(DBSOURCE, (err) => {
