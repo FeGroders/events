@@ -116,7 +116,7 @@ const database = new sqlite3.Database(DBSOURCE, (err) => {
     console.log("Base de dados conectada com sucesso.");
 
     var dbVersion = 0;
-    if (VERSION > 1) {
+    if (VERSION == 1) {
       if (dbVersion < VERSION) {
         listVersions.forEach((version) => {
           if (version.version > dbVersion) {
@@ -134,14 +134,12 @@ const database = new sqlite3.Database(DBSOURCE, (err) => {
       }
     } else {
       database.get("SELECT version FROM version", (err, row: any) => {
-        if (VERSION > 1 && err) {
+        if (err) {
           console.log("Versão da base de dados não encontrada.");
         } else {
           console.log("Versão da base de dados encontrada");
-          if (!err) {
-            dbVersion = row.version;
-          } 
-
+          dbVersion = row.version;
+          
           // CREATE TABLES
           if (dbVersion < VERSION) {
             listVersions.forEach((version) => {
