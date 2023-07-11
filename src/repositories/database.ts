@@ -91,29 +91,27 @@ const database = new sqlite3.Database(DBSOURCE, (err) => {
           console.log("Tabela já existe.");
         } else {
           console.log("Tabela criada com sucesso.");
-
-          if (i === listExecSQL.length - 1) {
-            var salt = bcrypt.genSaltSync(10);
-            database.run(SQL_INSERT_USER, ["teste", "teste@teste.com", bcrypt.hashSync("teste", salt), salt, Date()])
-            console.log("Usuário de teste criado com sucesso.")
-          
-            database.run(SQL_INSERT_EVENT, ["Evento de teste", "Evento de teste", "2023-08-01", "Local de teste"])
-            database.run(SQL_INSERT_EVENT, ["Evento de teste 2", "Evento de teste 2", "2023-08-01", "Local de teste 2"])
-            database.run(SQL_INSERT_EVENT, ["Evento de teste 3", "Evento de teste 3", "2023-08-01", "Local de teste 3"])
-            console.log("Evento de teste criado com sucesso.")
-
-            database.run(SQL_INSERT_REGISTRATION, [1, 1, 0]);
-            console.log("Inscrição de teste criada com sucesso.")
-
-            database.run(SQL_INSERT_CERTIFICATE, [1, 1, require('crypto').createHash('md5').update("1-1").digest("hex")]);
-            console.log("Certificado de teste criado com sucesso.")
-
-            database.run(SQL_INSERT_TESTE, [1, 1, require('crypto').createHash('md5').update("1-1").digest("hex")]);
-            console.log("Teste de teste criado com sucesso.")
-          }
         }
       });
     }
+
+    var salt = bcrypt.genSaltSync(10);
+    database.run(SQL_INSERT_USER, ["teste", "teste@teste.com", bcrypt.hashSync("teste", salt), salt, Date()])
+    console.log("Usuário de teste criado com sucesso.")
+  
+    database.run(SQL_INSERT_EVENT, ["Evento de teste", "Evento de teste", "2023-08-01", "Local de teste"])
+    database.run(SQL_INSERT_EVENT, ["Evento de teste 2", "Evento de teste 2", "2023-08-01", "Local de teste 2"])
+    database.run(SQL_INSERT_EVENT, ["Evento de teste 3", "Evento de teste 3", "2023-08-01", "Local de teste 3"])
+    console.log("Evento de teste criado com sucesso.")
+
+    database.run(SQL_INSERT_REGISTRATION, [1, 1, 0]);
+    console.log("Inscrição de teste criada com sucesso.")
+
+    database.run(SQL_INSERT_CERTIFICATE, [1, 1, require('crypto').createHash('md5').update("1-1").digest("hex")]);
+    console.log("Certificado de teste criado com sucesso.")
+
+    database.run(SQL_INSERT_TESTE, [1, 1, require('crypto').createHash('md5').update("1-1").digest("hex")]);
+    console.log("Teste de teste criado com sucesso.")
   }
 });
 
