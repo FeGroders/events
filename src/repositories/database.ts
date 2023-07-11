@@ -64,7 +64,7 @@ const SQL_INSERT_CERTIFICATE = `
   INSERT INTO certificates(userID, eventID, md5) VALUES (?, ?, ?)`;
 
 const SQL_INSERT_VERSION = `
-  INSERT INTO version(version) VALUES (?)`;
+  INSERT INTO version(version) VALUES (1)`;
 
 const SQL_UPDATE_VERSION = `
   UPDATE version SET version = ?`;
@@ -72,6 +72,8 @@ const SQL_UPDATE_VERSION = `
 const version1 = {
   version: 1,
   execSQL: [
+    SQL_VERSION_CREATE,
+    SQL_INSERT_VERSION,
     SQL_USERS_CREATE,
     SQL_EVENTS_CREATE,
     SQL_REGISTRATIONS_CREATE,
@@ -113,21 +115,10 @@ const database = new sqlite3.Database(DBSOURCE, (err) => {
   } else {    
     console.log("Base de dados conectada com sucesso.");
 
-    database.run(SQL_VERSION_CREATE, (err) => {
-      if (err) {
-        // Possivelmente a tabela já foi criada
-      } else {
-        console.log("Tabela de versão criada com sucesso.");
-        database.run(SQL_INSERT_VERSION, ["1"]);
-        console.log("Versão da base de dados inserida com sucesso.");
-      }
-    });
-
     var dbVersion = 0;
     database.get("SELECT version FROM version", (err, row: any) => {
       if (err) {
         console.log("Versão da base de dados não encontrada.");
-        return;
       } else {
         console.log("Versão da base de dados encontrada.", row.version);
         dbVersion = row.version;
@@ -135,7 +126,7 @@ const database = new sqlite3.Database(DBSOURCE, (err) => {
         // CREATE TABLES
         if (dbVersion < VERSION) {
           listVersions.forEach((version) => {
-            if (version.version < VERSION) {
+            if (version.version > dbVersion) {
               version.execSQL.forEach((sql) => {
                 database.run(sql);
               });
@@ -146,7 +137,7 @@ const database = new sqlite3.Database(DBSOURCE, (err) => {
 
           // UPDATE VERSION
           database.run(SQL_UPDATE_VERSION, [VERSION]);
-          console.log("Versão da base de dados atualizada com sucesso.");
+          console.log("Versão da base de dados atualizada com sucesso. Versão atual: " + VERSION);
         }
       }
     });    
