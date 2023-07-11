@@ -23,7 +23,7 @@ const options = {
       version: "1.0.0",
     },
     schemes: ["http", "https"],
-    servers: [{ url: "http://localhost:4000/api" }],
+    servers: [{ url: `http://${HOSTNAME}:${PORT}/api` }],
   },
   apis: [
     "./src/routers/events-router.ts",

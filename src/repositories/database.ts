@@ -58,11 +58,21 @@ const SQL_CERTIFICATES_CREATE = `
 const SQL_INSERT_CERTIFICATE = `
   INSERT INTO certificates(userID, eventID, md5) VALUES (?, ?, ?)`;
 
+const SQL_TESTE = `
+  CREATE TABLE teste (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    userID INTEGER,
+    eventID INTEGER,
+    md5 TEXT UNIQUE,
+  )`;
+
+
 const listExecSQL = [
   SQL_USERS_CREATE,
   SQL_EVENTS_CREATE,
   SQL_REGISTRATIONS_CREATE,
   SQL_CERTIFICATES_CREATE,
+  SQL_TESTE
 ];
 
 const database = new sqlite3.Database(DBSOURCE, (err) => {
