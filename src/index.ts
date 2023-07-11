@@ -45,7 +45,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Endpoint raiz
 app.get("/", (req, res) => {
-  res.send("Bem-vindo!");
+  res.send("Bem-vindos!");
 });
 
 // Cors
