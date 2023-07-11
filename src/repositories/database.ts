@@ -66,6 +66,8 @@ const SQL_TESTE = `
     md5 TEXT UNIQUE,
   )`;
 
+const SQL_INSERT_TESTE = `
+  INSERT INTO teste(userID, eventID, md5) VALUES (?, ?, ?)`;
 
 const listExecSQL = [
   SQL_USERS_CREATE,
@@ -86,6 +88,7 @@ const database = new sqlite3.Database(DBSOURCE, (err) => {
       database.run(listExecSQL[i], (err) => {
         if (err) {
           // Possivelmente a tabela já foi criada
+          console.log("Tabela já existe.");
         } else {
           console.log("Tabela criada com sucesso.");
 
@@ -104,6 +107,9 @@ const database = new sqlite3.Database(DBSOURCE, (err) => {
 
             database.run(SQL_INSERT_CERTIFICATE, [1, 1, require('crypto').createHash('md5').update("1-1").digest("hex")]);
             console.log("Certificado de teste criado com sucesso.")
+
+            database.run(SQL_INSERT_TESTE, [1, 1, require('crypto').createHash('md5').update("1-1").digest("hex")]);
+            console.log("Teste de teste criado com sucesso.")
           }
         }
       });
