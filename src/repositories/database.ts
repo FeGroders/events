@@ -131,25 +131,25 @@ const database = new sqlite3.Database(DBSOURCE, (err) => {
       } else {
         console.log("Versão da base de dados encontrada.", row.version);
         dbVersion = row.version;
-      }
-    });
 
-    // CREATE TABLES
-    listVersions.forEach((version) => {
-      if (version.version > dbVersion) {
-        version.execSQL.forEach((sql) => {
-          database.run(sql);
+        // CREATE TABLES
+        listVersions.forEach((version) => {
+          if (version.version > dbVersion) {
+            version.execSQL.forEach((sql) => {
+              database.run(sql);
+            });
+          }
         });
-      }
-    });
-    console.log("Tabelas criadas com sucesso.");
-    createDefaultData();
+        console.log("Tabelas criadas com sucesso.");
+        createDefaultData();
 
-    // UPDATE VERSION
-    if (dbVersion < VERSION) {
-      database.run(SQL_UPDATE_VERSION, [VERSION]);
-      console.log("Versão da base de dados atualizada com sucesso.");
-    }
+        // UPDATE VERSION
+        if (dbVersion < VERSION) {
+          database.run(SQL_UPDATE_VERSION, [VERSION]);
+          console.log("Versão da base de dados atualizada com sucesso.");
+        }
+      }
+    });    
   }
 });
 
