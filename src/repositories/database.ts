@@ -117,10 +117,10 @@ const database = new sqlite3.Database(DBSOURCE, (err) => {
 
     var dbVersion = 0;
     database.get("SELECT version FROM version", (err, row: any) => {
-      if (err) {
+      if (VERSION > 1 && err) {
         console.log("Versão da base de dados não encontrada.");
       } else {
-        console.log("Versão da base de dados encontrada.", row.version);
+        console.log("Versão da base de dados encontrada");
         dbVersion = row.version;
 
         // CREATE TABLES
