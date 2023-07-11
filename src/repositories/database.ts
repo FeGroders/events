@@ -2,8 +2,6 @@ import sqlite3 from "sqlite3";
 import bcrypt from "bcrypt";
 const DBSOURCE = "db.sqlite";
 
-const VERSION = 1;
-
 const SQL_VERSION_CREATE = `
 CREATE TABLE version (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -71,18 +69,24 @@ const SQL_INSERT_VERSION = `
 const SQL_UPDATE_VERSION = `
   UPDATE version SET version = ?`;
 
-const listExecSQL = [
-  SQL_USERS_CREATE,
-  SQL_EVENTS_CREATE,
-  SQL_REGISTRATIONS_CREATE,
-  SQL_CERTIFICATES_CREATE,
-];
-
 const version1 = {
   version: 1,
-  execSQL: listExecSQL,
+  execSQL: [
+    SQL_USERS_CREATE,
+    SQL_EVENTS_CREATE,
+    SQL_REGISTRATIONS_CREATE,
+    SQL_CERTIFICATES_CREATE,
+  ]
 };
 
+const version2 = {
+  version: 2,
+  execSQL: [
+    "INSERT INTO events(name, description, date, location) VALUES ('Evento de teste342432432', 'Evento de teste42343', '2023-08-01', 'Local de teste423324')",
+  ],
+};
+
+const VERSION = 1;
 const listVersions = [version1];
 
 function createDefaultData() {
@@ -114,7 +118,7 @@ const database = new sqlite3.Database(DBSOURCE, (err) => {
         // Possivelmente a tabela já foi criada
       } else {
         console.log("Tabela de versão criada com sucesso.");
-        database.run(SQL_INSERT_VERSION, [VERSION]);
+        database.run(SQL_INSERT_VERSION, ["1"]);
         console.log("Versão da base de dados inserida com sucesso.");
       }
     });
@@ -122,8 +126,10 @@ const database = new sqlite3.Database(DBSOURCE, (err) => {
     var dbVersion = 0;
     database.get("SELECT version FROM version", (err, row: any) => {
       if (err) {
-        // Possivelmente a tabela já foi criada
+        console.log("Versão da base de dados não encontrada.");
+        return;
       } else {
+        console.log("Versão da base de dados encontrada.", row.version);
         dbVersion = row.version;
       }
     });
