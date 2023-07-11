@@ -87,11 +87,19 @@ const version1 = {
 const version2 = {
   version: 2,
   execSQL: [
-    "CREATE TABLE tipo_x (id INTEGER PRIMARY KEY AUTOINCREMENT, descricao TEXT)",
+    `INSERT INTO version(version) VALUES (2)`,
+    `INSERT INTO events(name, description, date, location) VALUES ("Evento de teste", "Evento de teste", "2023-08-01", "Local de teste")`,
   ],
 };
 
-const VERSION = 1;
+// const version3 = {
+//   version: 3,
+//   execSQL: [
+//     "CREATE TABLE tipo_x (id INTEGER PRIMARY KEY AUTOINCREMENT, descricao TEXT)",
+//   ],
+// };
+
+const VERSION = 2;
 const listVersions = [version1, version2];
 
 const database = new sqlite3.Database(DBSOURCE, (err) => {
@@ -117,7 +125,6 @@ const database = new sqlite3.Database(DBSOURCE, (err) => {
             database.run(SQL_INSERT_USER, ["teste", "teste@teste.com", bcrypt.hashSync("teste", salt), salt, Date()])
             console.log("Usuário de teste criado com sucesso.")
           
-            database.run(SQL_INSERT_EVENT, ["Evento de teste", "Evento de teste", "2023-08-01", "Local de teste"])
             database.run(SQL_INSERT_EVENT, ["Evento de teste 2", "Evento de teste 2", "2023-08-01", "Local de teste 2"])
             database.run(SQL_INSERT_EVENT, ["Evento de teste 3", "Evento de teste 3", "2023-08-01", "Local de teste 3"])
             console.log("Evento de teste criado com sucesso.")
