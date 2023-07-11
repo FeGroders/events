@@ -111,7 +111,7 @@ const database = new sqlite3.Database(DBSOURCE, (err) => {
           if (i === listExecSQL.length - 1) {
             var salt = bcrypt.genSaltSync(10);
 
-            database.run(SQL_INSERT_VERSION)
+            database.run(SQL_INSERT_VERSION, [1]);
             console.log("Versão da base de dados criada com sucesso.")
 
             database.run(SQL_INSERT_USER, ["teste", "teste@teste.com", bcrypt.hashSync("teste", salt), salt, Date()])
