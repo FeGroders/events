@@ -1,7 +1,14 @@
 import sqlite3 from "sqlite3";
 import bcrypt from "bcrypt";
-
 const DBSOURCE = "db.sqlite";
+
+const VERSION = 1;
+
+const SQL_VERSION_CREATE = `
+CREATE TABLE version (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  version INTEGER
+)`;
 
 const SQL_USERS_CREATE = `
 CREATE TABLE users (
@@ -58,24 +65,25 @@ const SQL_CERTIFICATES_CREATE = `
 const SQL_INSERT_CERTIFICATE = `
   INSERT INTO certificates(userID, eventID, md5) VALUES (?, ?, ?)`;
 
-const SQL_TESTE = `
-  CREATE TABLE teste (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    userID INTEGER,
-    eventID INTEGER,
-    md5 TEXT UNIQUE,
-  )`;
+const SQL_INSERT_VERSION = `
+  INSERT INTO version(version) VALUES (?)`;
 
-const SQL_INSERT_TESTE = `
-  INSERT INTO teste(userID, eventID, md5) VALUES (?, ?, ?)`;
+const SQL_UPDATE_VERSION = `
+  UPDATE version SET version = ?`;
 
 const listExecSQL = [
   SQL_USERS_CREATE,
   SQL_EVENTS_CREATE,
   SQL_REGISTRATIONS_CREATE,
   SQL_CERTIFICATES_CREATE,
-  SQL_INSERT_TESTE
 ];
+
+const version1 = {
+  version: 1,
+  execSQL: listExecSQL,
+};
+
+const listVersions = [version1];
 
 function createDefaultData() {
   var salt = bcrypt.genSaltSync(10);
@@ -98,28 +106,43 @@ const database = new sqlite3.Database(DBSOURCE, (err) => {
   if (err) {
     console.error(err.message);
     throw err;
-  } else {
+  } else {    
     console.log("Base de dados conectada com sucesso.");
 
-    for (let i = 0; i < listExecSQL.length; i++) {
-      database.run(listExecSQL[i], (err) => {
-        if (err) {
-          // Possivelmente a tabela já foi criada
+    database.run(SQL_VERSION_CREATE, (err) => {
+      if (err) {
+        // Possivelmente a tabela já foi criada
+      } else {
+        console.log("Tabela de versão criada com sucesso.");
+        database.run(SQL_INSERT_VERSION, [VERSION]);
+        console.log("Versão da base de dados inserida com sucesso.");
+      }
+    });
 
-          if (i === listExecSQL.length - 1) {
-            createDefaultData();  
-          }
-        } else {
-          console.log("Tabela criada com sucesso.");
+    var dbVersion = 0;
+    database.get("SELECT version FROM version", (err, row: any) => {
+      if (err) {
+        // Possivelmente a tabela já foi criada
+      } else {
+        dbVersion = row.version;
+      }
+    });
 
-          console.log("teste", listExecSQL.length - 1)
-          console.log("testei", i)
+    // CREATE TABLES
+    listVersions.forEach((version) => {
+      if (version.version > dbVersion) {
+        version.execSQL.forEach((sql) => {
+          database.run(sql);
+        });
+      }
+    });
+    console.log("Tabelas criadas com sucesso.");
+    createDefaultData();
 
-          if (i === listExecSQL.length - 1) {
-            createDefaultData();  
-          }
-        }
-      });
+    // UPDATE VERSION
+    if (dbVersion < VERSION) {
+      database.run(SQL_UPDATE_VERSION, [VERSION]);
+      console.log("Versão da base de dados atualizada com sucesso.");
     }
   }
 });
