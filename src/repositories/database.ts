@@ -116,33 +116,49 @@ const database = new sqlite3.Database(DBSOURCE, (err) => {
     console.log("Base de dados conectada com sucesso.");
 
     var dbVersion = 0;
-    database.get("SELECT version FROM version", (err, row: any) => {
-      if (VERSION > 1 && err) {
-        console.log("Versão da base de dados não encontrada.");
-      } else {
-        console.log("Versão da base de dados encontrada");
-        if (!err) {
-          dbVersion = row.version;
-        } 
+    if (VERSION > 1) {
+      if (dbVersion < VERSION) {
+        listVersions.forEach((version) => {
+          if (version.version > dbVersion) {
+            version.execSQL.forEach((sql) => {
+              database.run(sql);
+            });
+          }
+        })
+        console.log("Tabelas criadas com sucesso.");
+        createDefaultData();
 
-        // CREATE TABLES
-        if (dbVersion < VERSION) {
-          listVersions.forEach((version) => {
-            if (version.version > dbVersion) {
-              version.execSQL.forEach((sql) => {
-                database.run(sql);
-              });
-            }
-          })
-          console.log("Tabelas criadas com sucesso.");
-          createDefaultData();
-
-          // UPDATE VERSION
-          database.run(SQL_UPDATE_VERSION, [VERSION]);
-          console.log("Versão da base de dados atualizada com sucesso. Versão atual: " + VERSION);
-        }
+        // UPDATE VERSION
+        database.run(SQL_UPDATE_VERSION, [VERSION]);
+        console.log("Versão da base de dados atualizada com sucesso. Versão atual: " + VERSION);
       }
-    });    
+    } else {
+      database.get("SELECT version FROM version", (err, row: any) => {
+        if (VERSION > 1 && err) {
+          console.log("Versão da base de dados não encontrada.");
+        } else {
+          console.log("Versão da base de dados encontrada");
+          if (!err) {
+            dbVersion = row.version;
+          } 
+
+          // CREATE TABLES
+          if (dbVersion < VERSION) {
+            listVersions.forEach((version) => {
+              if (version.version > dbVersion) {
+                version.execSQL.forEach((sql) => {
+                  database.run(sql);
+                });
+              }
+            })
+
+            // UPDATE VERSION
+            database.run(SQL_UPDATE_VERSION, [VERSION]);
+            console.log("Versão da base de dados atualizada com sucesso. Versão atual: " + VERSION);
+          }
+        }
+      });    
+    }
   }
 });
 
